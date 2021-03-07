@@ -1,0 +1,72 @@
+test(int, int, int, int, int*, int, int, int*):
+        push    rbp
+        mov     rbp, rsp
+        mov     DWORD PTR [rbp-20], edi
+        mov     DWORD PTR [rbp-24], esi
+        mov     DWORD PTR [rbp-28], edx
+        mov     DWORD PTR [rbp-32], ecx
+        mov     QWORD PTR [rbp-40], r8
+        mov     DWORD PTR [rbp-44], r9d
+        mov     DWORD PTR [rbp-4], 0
+        mov     edx, DWORD PTR [rbp-28]
+        mov     eax, DWORD PTR [rbp-24]
+        add     eax, edx
+        mov     DWORD PTR [rbp-20], eax
+        mov     eax, DWORD PTR [rbp-20]
+        imul    eax, DWORD PTR [rbp+16]
+        mov     DWORD PTR [rbp-32], eax
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        lea     rdx, [0+rax*4]
+        mov     rax, QWORD PTR [rbp-40]
+        add     rax, rdx
+        mov     eax, DWORD PTR [rax]
+        mov     edx, DWORD PTR [rbp-32]
+        sub     edx, eax
+        mov     eax, edx
+        mov     DWORD PTR [rbp-44], eax
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        lea     rdx, [0+rax*4]
+        mov     rax, QWORD PTR [rbp+24]
+        add     rax, rdx
+        mov     edx, DWORD PTR [rax]
+        mov     eax, DWORD PTR [rbp-44]
+        add     eax, edx
+        mov     DWORD PTR [rbp-4], eax
+        mov     eax, DWORD PTR [rbp-4]
+        pop     rbp
+        ret
+main:
+        push    rbp
+        mov     rbp, rsp
+        sub     rsp, 64 //different from 10.2 gcc
+        mov     DWORD PTR [rbp-4], 1
+        mov     DWORD PTR [rbp-8], 2
+        mov     DWORD PTR [rbp-12], 3
+        mov     DWORD PTR [rbp-16], 4
+        mov     DWORD PTR [rbp-48], 5
+        mov     DWORD PTR [rbp-44], 6
+        mov     DWORD PTR [rbp-40], 7
+        mov     DWORD PTR [rbp-20], 8
+        mov     DWORD PTR [rbp-24], 9
+        mov     DWORD PTR [rbp-64], 10
+        mov     DWORD PTR [rbp-60], 11
+        mov     DWORD PTR [rbp-28], 0
+        mov     r9d, DWORD PTR [rbp-20]
+        lea     r8, [rbp-48]
+        mov     ecx, DWORD PTR [rbp-16]
+        mov     edx, DWORD PTR [rbp-12]
+        mov     esi, DWORD PTR [rbp-8]
+        mov     eax, DWORD PTR [rbp-4]
+        lea     rdi, [rbp-64]
+        push    rdi
+        mov     edi, DWORD PTR [rbp-24]
+        push    rdi
+        mov     edi, eax
+        call    test(int, int, int, int, int*, int, int, int*)
+        add     rsp, 16
+        mov     DWORD PTR [rbp-28], eax
+        mov     eax, 0
+        leave
+        ret
