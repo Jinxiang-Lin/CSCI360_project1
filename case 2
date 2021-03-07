@@ -1,0 +1,55 @@
+main:
+        push    rbp
+        mov     rbp, rsp
+        mov     DWORD PTR [rbp-48], 10
+        mov     DWORD PTR [rbp-44], 74
+        mov     DWORD PTR [rbp-40], 54
+        mov     DWORD PTR [rbp-36], 46
+        mov     DWORD PTR [rbp-32], 7
+        mov     DWORD PTR [rbp-4], 0
+        mov     DWORD PTR [rbp-8], 0
+.L6:
+        cmp     DWORD PTR [rbp-8], 3
+        jg      .L2
+        mov     eax, DWORD PTR [rbp-8]
+        mov     DWORD PTR [rbp-4], eax
+        mov     eax, DWORD PTR [rbp-8]
+        add     eax, 1
+        mov     DWORD PTR [rbp-12], eax
+.L5:
+        cmp     DWORD PTR [rbp-12], 4
+        jg      .L3
+        mov     eax, DWORD PTR [rbp-12]
+        cdqe
+        mov     edx, DWORD PTR [rbp-48+rax*4]
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     eax, DWORD PTR [rbp-48+rax*4]
+        cmp     edx, eax
+        jge     .L4
+        mov     eax, DWORD PTR [rbp-12]
+        mov     DWORD PTR [rbp-4], eax
+.L4:
+        add     DWORD PTR [rbp-12], 1
+        jmp     .L5
+.L3:
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     eax, DWORD PTR [rbp-48+rax*4]
+        mov     DWORD PTR [rbp-16], eax
+        mov     eax, DWORD PTR [rbp-8]
+        cdqe
+        mov     edx, DWORD PTR [rbp-48+rax*4]
+        mov     eax, DWORD PTR [rbp-4]
+        cdqe
+        mov     DWORD PTR [rbp-48+rax*4], edx
+        mov     eax, DWORD PTR [rbp-8]
+        cdqe
+        mov     edx, DWORD PTR [rbp-16]
+        mov     DWORD PTR [rbp-48+rax*4], edx
+        add     DWORD PTR [rbp-8], 1
+        jmp     .L6
+.L2:
+        mov     eax, 0
+        pop     rbp
+        ret
