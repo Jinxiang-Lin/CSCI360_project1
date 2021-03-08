@@ -12,6 +12,8 @@ public:
 
 	void printSource() const;
 private:
-	vector<string> source;
+	vector<string> source = "";
+	vector<string> assembly_codes = "";
+	int add_offSet = 0;
 };
 #endif
