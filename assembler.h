@@ -16,8 +16,8 @@ public:
    assembly_code stores the assembly code which is translated from source;
    address offset defaults to 0*/
 private:
-	vector<string> source = "";
-	vector<string> assembly_codes = "";
+	vector<string> source;
+	vector<string> assembly_codes;
 	int add_offSet = 0;
 };
 #endif
