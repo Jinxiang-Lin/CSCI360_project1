@@ -26,7 +26,13 @@ int main(){
 	Assembler assembler;
 	assembler.inputSource(source);
 
-	assembler.printSource();
+	/*read and push all int vars into vector<Mapping> var
+	  and store the int value to var.value and address offSet into var.address_offSet*/
+	assembler.set_var();
+	assembler.print_var();
+
+
+
 	return 0;
 	
 }
