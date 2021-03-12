@@ -25,6 +25,7 @@ int main(){
 
 	Assembler assembler;
 	assembler.inputSource(source);
+	assembler.printSource();
 
 	return 0;
 	
