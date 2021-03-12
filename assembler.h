@@ -2,6 +2,7 @@
 #define ASSEMBLER_H
 #include<iostream>
 #include<vector>
+#include<regex>
 using namespace std;
 
 struct Var{
@@ -31,6 +32,8 @@ public:
 	void inputSource(const vector<string> newSource);
 	/*print c++ instructions*/
 	void printSource() const;
+	/*check if source code is a leaf function*/
+	bool check_leaf_funct() const;
 
 private:
 	vector<string>source;
