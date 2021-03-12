@@ -88,3 +88,16 @@ void Assembler::printSource() const{
 		cout << source[i] << endl;
 	}
 }
+
+/*check if a function is a leaf function.
+  a function is a leaf function if it doesn't
+  call any other function*/
+bool Assembler::check_leaf_funct() const{
+	regex function_check(".*[a-z]*=?[a-z]+\\(([a-z]+,?)+\\);");
+	
+	for(auto &x : source){
+		if(regex_match(x, function_check))
+		 	return 1;
+	}
+	return 0;
+}
