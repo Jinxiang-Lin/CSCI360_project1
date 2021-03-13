@@ -13,6 +13,12 @@ string Assembler::add_mov(string source, string dest, int size){
 } 
 
 int Assembler::get_offset(string name, vector<Var> variable){
+	for (auto & var : variable) {
+		if(var.variables_name == name){
+			return var.address_offset;
+		}
+	}
+	return -1;
 }
 
 void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
@@ -87,17 +93,4 @@ void Assembler::printSource() const{
 	{
 		cout << source[i] << endl;
 	}
-}
-
-/*check if a function is a leaf function.
-  a function is a leaf function if it doesn't
-  call any other function*/
-bool Assembler::check_leaf_funct() const{
-	regex function_check(".*[a-z]*=?[a-z]+\\(([a-z]+,?)+\\);");
-	
-	for(auto &x : source){
-		if(regex_match(x, function_check))
-		 	return 1;
-	}
-	return 0;
 }
