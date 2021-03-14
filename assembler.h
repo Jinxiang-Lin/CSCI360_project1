@@ -1,5 +1,8 @@
 #ifndef ASSEMBLER_H
 #define ASSEMBLER_H
+
+#include "DataConverter.h"
+
 #include<iostream>
 #include<vector>
 #include<regex>
@@ -28,6 +31,10 @@ struct Funct{
 class Assembler{
 public:
 	Assembler();
+	string add_mov(string source, string destination, int size);
+	int get_offset(string name, vector<Var> variables);
+	void arithmetic_handler(string* source, int loc, Funct &f);
+	void for_loop_handler(string* source, int loc);
 	/*store c++ instructions*/
 	void inputSource(const vector<string> newSource);
 	/*print c++ instructions*/
