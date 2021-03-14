@@ -34,7 +34,8 @@ public:
 	void printSource() const;
 	/*check if source code is a leaf function*/
 	bool check_leaf_funct() const;
-
+ 	vector<Var> vars_handler(string variable_string, int &address_offset);
+ 	vector<int> split(string str);
 private:
 	vector<string>source;
 	vector<Funct> functions;

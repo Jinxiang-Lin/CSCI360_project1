@@ -26,7 +26,6 @@ int main(){
 	Assembler assembler;
 	assembler.inputSource(source);
 	assembler.printSource();
-	cout << assembler.check_leaf_funct() << endl;
 	return 0;
 	
 }
