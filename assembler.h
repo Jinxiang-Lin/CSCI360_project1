@@ -9,7 +9,7 @@
 using namespace std;
 
 struct Var{
-	string data_type;
+	string data_type = "int";
 	string variables_name;
 	int data_value = 0;
 	int address_offset;
@@ -43,6 +43,7 @@ public:
 	bool check_leaf_funct() const;
  	vector<Var> vars_handler(string variable_string, int &address_offset);
  	vector<int> split(string str);
+ 	void test_var_handler(string str, int offset);
 private:
 	vector<string>source;
 	vector<Funct> functions;
