@@ -42,11 +42,15 @@ public:
 	void printSource() const;
 	/*check if source code is a leaf function*/
 	bool check_leaf_funct() const;
+	int red_zone(); // do red_zoom and test arithmetic handler
  	vector<Var> vars_handler(string variable_string, int &address_offset);
  	vector<int> split(string str);
  	void test_var_handler(string str, int offset);
 private:
 	vector<string>source;
 	vector<Funct> functions;
+	int red_zone_size = 0;
+	/*rbp: base pointer during function calls
+	  rsp: point to the curent top of the stack*/
 };
 #endif

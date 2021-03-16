@@ -20,6 +20,10 @@ int Assembler::get_offset(string name, vector<Var> variable){
 		}
 	}
 	return -1;
+/*read through variables, if name is found, return its offset*/
+int Assembler::get_offset(string name, vector<Var> variables){
+	
+	return 0;
 }
 
 void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
@@ -29,7 +33,7 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	// get output name
 	string output_name = temp.at(0);
 	// get output offset
-	int output_offset = get_offset(output_name, f1.variables);
+	int output_offset = get_offset(output_name, f1.vars);
 
 	string op1, op2, op_string;
 	char operation;
@@ -50,7 +54,7 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	op1 = operands.at(0);
 	op2 = operands.at(1);
 
-	int op1_offset = get_offset(op1, f1.variables);
+	int op1_offset = get_offset(op1, f1.vars);
 	string op_source1;
 	if(op1_offset == -1){
 		op_source1 = "$"+op1;
@@ -60,7 +64,7 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	string dest1 = "eax";
 	f1.assembly_instructions.push_back(add_mov(op_source1, dest1, 32)); 
 
-	int op2_offset = get_offset(op2, f1.variables);
+	int op2_offset = get_offset(op2, f1.vars);
 	string op_source2;
 	if(op2_offset == -1){
 		op_source2 = "$"+op2;
@@ -96,8 +100,6 @@ void Assembler::printSource() const{
 		cout << source[i] << endl;
 	}
 }
-<<<<<<< HEAD
-=======
 
 /*check if a function is a leaf function.
   a function is a leaf function if it doesn't
@@ -118,7 +120,7 @@ bool Assembler::check_leaf_funct() const{
 */
 vector<Var> Assembler::vars_handler(string variable_string, int &address_offset){
 	vector<Var> variables;
-	string data_type;
+	//string data_type;
 
 	//find data type int;
 	//data_type = variable_string.substr(variable_string.find("int"), variable_string.find("int")+3);
@@ -138,6 +140,8 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 
 		address_offset *= array_size;
 		int temp_offset = address_offset;
+
+		red_zone_size += array_size;
 		for(int i = 0; i < array_size; i++){
 			Var temp_var;
 			//temp_var.data_type = data_type;
@@ -152,6 +156,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 	}
 	//else variable_string is a single variable
 	else{
+		red_zone_size++;
 		Var temp_var;
 
 		//get the variable type
@@ -195,6 +200,9 @@ vector<int> Assembler::split(string str){
 	return int_values;
 }
 
+int Assembler::red_zone(){
+	return red_zone_size*4;
+}
 //test function
 void Assembler::test_var_handler(string str, int offset){
 	vector<Var> test_var = vars_handler(str, offset);
@@ -207,4 +215,3 @@ void Assembler::test_var_handler(string str, int offset){
 	}
 }
 
->>>>>>> 36286a302005df39519ae42a927c52eb34c0c8ae
