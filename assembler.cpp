@@ -2,6 +2,7 @@
 
 Assembler::Assembler(){}
 
+
 string Assembler::add_mov(string source, string dest, int size){
     string opcode;
 	if(size == 64){
@@ -78,6 +79,7 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 void for_loop_handler(string* source, int loc){
 
 }
+ 
 /*store c++ instructions*/
 void Assembler::inputSource(const vector<string> newSource)
 {
@@ -94,3 +96,115 @@ void Assembler::printSource() const{
 		cout << source[i] << endl;
 	}
 }
+<<<<<<< HEAD
+=======
+
+/*check if a function is a leaf function.
+  a function is a leaf function if it doesn't
+  call any other function*/
+bool Assembler::check_leaf_funct() const{
+	regex function_check(".*[a-z]*=?[a-z]+\\(([a-z]+,?)+\\);");
+	
+	for(auto &x : source){
+		if(regex_match(x, function_check))
+		 	return 1;
+	}
+	return 0;
+}
+
+/*variable_handler: read a variable string; 
+					check if the variable string is a variable or if it is a array; 
+					extracts data from the string and stores into va 	
+*/
+vector<Var> Assembler::vars_handler(string variable_string, int &address_offset){
+	vector<Var> variables;
+	string data_type;
+
+	//find data type int;
+	//data_type = variable_string.substr(variable_string.find("int"), variable_string.find("int")+3);
+
+	//if variable_string is an array
+	if(variable_string.find('[') != string::npos){
+		int array_size = 0;
+		vector<int> array_value;
+		string variable_name;
+
+		array_size = stoi(variable_string.substr(variable_string.find('[')+1, variable_string.find(']')-2));
+		array_value = split(variable_string.substr(variable_string.find('{'), variable_string.find('}')));
+
+		int index = 0;
+		index = variable_string.find("int")+4;
+		variable_name = variable_string[index];
+
+		address_offset *= array_size;
+		int temp_offset = address_offset;
+		for(int i = 0; i < array_size; i++){
+			Var temp_var;
+			//temp_var.data_type = data_type;
+			temp_var.variables_name = variable_name;
+
+			temp_var.data_value = array_value[i];
+			temp_var.address_offset = address_offset;
+			address_offset += 4;
+			variables.push_back(temp_var);
+		}
+		address_offset = temp_offset -4;
+	}
+	//else variable_string is a single variable
+	else{
+		Var temp_var;
+
+		//get the variable type
+		//temp_var.data_type = data_type;
+
+		//get the variable name
+		string variable_name;
+		int index = 0;
+		index = variable_string.find("int")+4;
+		variable_name = variable_string[index];
+		temp_var.variables_name = variable_name;
+
+		//get the value
+		temp_var.data_value = stoi(variable_string.substr(variable_string.find('=')+1, variable_string.length()));
+
+		//get the offset
+		temp_var.address_offset = address_offset;
+		variables.push_back(temp_var);
+
+		address_offset-= 4;
+
+	}
+	
+
+	return variables;
+}
+
+vector<int> Assembler::split(string str){
+	//{11,2,30}
+	vector<int> int_values;
+	string temp = "";
+	for(int i = 1; i < str.size(); i++){
+		if(str[i] == ',' || str[i] == '}')
+		{
+			int_values.push_back(stoi(temp));
+			temp = "";
+		}
+		else
+			temp = temp + str[i];
+	}
+	return int_values;
+}
+
+//test function
+void Assembler::test_var_handler(string str, int offset){
+	vector<Var> test_var = vars_handler(str, offset);
+	for(int i = 0; i < test_var.size(); i++){
+		cout << " data_type is " << test_var[i].data_type << endl;
+		cout << " variable name is " << test_var[i].variables_name << endl;
+		cout << " value is " << test_var[i].data_value << endl;
+		cout <<" address_offset is " << test_var[i].address_offset << endl;
+		cout << endl;
+	}
+}
+
+>>>>>>> 36286a302005df39519ae42a927c52eb34c0c8ae

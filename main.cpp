@@ -26,7 +26,12 @@ int main(){
 	Assembler assembler;
 	assembler.inputSource(source);
 	assembler.printSource();
-	cout << assembler.check_leaf_funct() << endl;
+	
+
+	//here is only for testing function
+	int add_off = -4;
+	string str = "    int i[3] = {11,2,3};";
+	assembler.test_var_handler(str, add_off);
 	return 0;
 	
 }
