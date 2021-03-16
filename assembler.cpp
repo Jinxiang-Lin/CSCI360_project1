@@ -20,10 +20,6 @@ int Assembler::get_offset(string name, vector<Var> variable){
 		}
 	}
 	return -1;
-/*read through variables, if name is found, return its offset*/
-int Assembler::get_offset(string name, vector<Var> variables){
-	
-	return 0;
 }
 
 void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
@@ -80,8 +76,26 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
 
-void for_loop_handler(string* source, int loc){
-
+string Assembler::for_begin_handler(string* source, int loc, Funct &f){
+	vector<string> temp; 
+	// split by equal sign
+	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
+	//int i = 0; i < 4; i++)
+	string temp_string;
+	string if_string;
+	string iterate_string;
+	//int i = 0;
+	for(int i = 0; i < 9; i++)
+		temp_string += temp.at(i);
+	vars_handler(temp_string,1);
+	//i < 4
+	for(int j = 12; j < 17; j++)
+		if_string += temp.at(j);
+	if_statement_handler(if_string,);
+	//i++
+	for(int k = 19; k < 22; k ++)
+		iterate_string += temp.at(k);
+	return iterate_string;
 }
  
 /*store c++ instructions*/

@@ -34,8 +34,7 @@ public:
 	string add_mov(string source, string destination, int size);
 	int get_offset(string name, vector<Var> variables);
 	void arithmetic_handler(string* source, int loc, Funct &f);
-	bool for_if_funct(string* source, int loc);
-	void for_loop_handler(string* source, int loc);
+	string for_begin_handler(string* source, int loc, Funct &f);
 	/*store c++ instructions*/
 	void inputSource(const vector<string> newSource);
 	/*print c++ instructions*/

@@ -13,8 +13,5 @@ class DataConverter
     public:
         static void split(const string &txt, vector<string> &output, char ch);
 };
-<<<<<<< HEAD
 
-=======
->>>>>>> a67b16f0f3370dd72d11207ef5ff30aa13e62408
 #endif
