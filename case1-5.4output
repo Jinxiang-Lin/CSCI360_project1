@@ -53,15 +53,15 @@ main:
         mov     DWORD PTR [rbp-64], 10
         mov     DWORD PTR [rbp-60], 11
         mov     DWORD PTR [rbp-28], 0
-        mov     r9d, DWORD PTR [rbp-20]
-        lea     r8, [rbp-48]
-        mov     ecx, DWORD PTR [rbp-16]
-        mov     edx, DWORD PTR [rbp-12]
-        mov     esi, DWORD PTR [rbp-8]
-        mov     eax, DWORD PTR [rbp-4]
-        lea     rdi, [rbp-64]
+        mov     r9d, DWORD PTR [rbp-20] //f
+        lea     r8, [rbp-48] //e[]
+        mov     ecx, DWORD PTR [rbp-16] //d
+        mov     edx, DWORD PTR [rbp-12] //c
+        mov     esi, DWORD PTR [rbp-8] //b
+        mov     eax, DWORD PTR [rbp-4] //a
+        lea     rdi, [rbp-64] //h[]
         push    rdi
-        mov     edi, DWORD PTR [rbp-24]
+        mov     edi, DWORD PTR [rbp-24] //g
         push    rdi
         mov     edi, eax
         call    test(int, int, int, int, int*, int, int, int*)

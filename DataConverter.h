@@ -12,4 +12,5 @@ class DataConverter
 {
     public:
         static void split(const string &txt, vector<string> &output, char ch);
-}
+};
+#endif
