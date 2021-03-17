@@ -87,7 +87,7 @@ string Assembler::for_begin_handler(string* source, int loc, Funct &f){
 	//int i = 0;
 	for(int i = 0; i < 9; i++)
 		temp_string += temp.at(i);
-	vars_handler(temp_string,1);
+	vars_handler(temp_string,address_offset);
 	//i < 4
 	for(int j = 12; j < 17; j++)
 		if_string += temp.at(j);
