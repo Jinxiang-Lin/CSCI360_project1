@@ -159,7 +159,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 		index = variable_string.find("int")+4;
 		variable_name = variable_string[index];
 
-		address_offset *= array_size;
+		//address_offset *= array_size;
 		int temp_offset = address_offset;
 
 		//red_zone_size += array_size;
@@ -170,7 +170,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 
 			temp_var.data_value = array_value[i];
 			temp_var.address_offset = address_offset;
-			address_offset += 4;
+			address_offset -= 4;
 			variables.push_back(temp_var);
 		}
 		address_offset = temp_offset -4;
@@ -248,23 +248,27 @@ void Assembler::variables_handler_versionTwo(){
 	vector<string> variables_str;
 	for(int i = main_start; i < main_end; i++){
 		if(source[i].find("int") == 0){
-			cout << source[i] << endl;
+			variables_str.push_back(source[i]);
 		}
 	}
 
-/*
+
 	vector<Var>temp;
-	for(int i = main_start; i < main_end-1; i++){
-		temp = vars_handler(source[i], address_offset);
+	for(int i = 0; i < variables_str.size(); i++){
+		temp = vars_handler(variables_str[i], address_offset);
 		variables_information.push_back(temp);
 	}
 	
 	for(int i =0; i < variables_information.size(); i++){
 		for(int j = 0; j < variables_information[i].size(); j++){
 			cout << "data type is "<<variables_information[i][j].data_type << endl;
+			cout << "variable_name is "<<variables_information[i][j].variables_name<<endl;
+			cout << "value is "<<variables_information[i][j].data_value << endl;
+			cout << "address_offset is" << variables_information[i][j].address_offset<<endl;
+			cout << endl;
 		}
 	}
-*/	
+	
 }
 
 int Assembler::find_main_start(){
