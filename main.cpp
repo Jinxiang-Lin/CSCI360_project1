@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "assembler.h"
+
 using namespace std;
 
 int main(){
@@ -26,12 +27,15 @@ int main(){
 	Assembler assembler;
 	assembler.inputSource(source);
 	assembler.printSource();
+	assembler.variables_handler_versionTwo();
 	
-
+/*
 	//here is only for testing function
 	int add_off = -4;
 	string str = "    int i[3] = {11,2,3};";
 	assembler.test_var_handler(str, add_off);
+*/	
+
 	return 0;
 	
 }

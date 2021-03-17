@@ -13,6 +13,7 @@ string Assembler::add_mov(string source, string dest, int size){
 	return opcode + " " + source + ","+ dest;
 } 
 
+
 int Assembler::get_offset(string name, vector<Var> variable){
 	for (auto & var : variable) {
 		if(var.variables_name == name){
@@ -21,6 +22,7 @@ int Assembler::get_offset(string name, vector<Var> variable){
 	}
 	return -1;
 }
+
 
 void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	vector<string> temp; 
@@ -37,10 +39,12 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	if(temp.at(1).find('+') != -1){
 		operation = '+';
 		op_string = "addl";
-	}else if(temp.at(1).find('-') != -1){
+	}
+	else if(temp.at(1).find('-') != -1){
 		operation = '-';
 		op_string = "subl";
-	}else if(temp.at(1).find('*') != -1){
+	}
+	else if(temp.at(1).find('*') != -1){
 		operation = '*';
 		op_string = "imul";
 	}
@@ -76,7 +80,8 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
 
-string Assembler::for_begin_handler(string* source, int loc, Funct &f){
+/*
+string Assembler::for_begin_handler(string* source, int loc, Funct &f, int &address_offset){
 	vector<string> temp; 
 	// split by equal sign
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
@@ -87,16 +92,16 @@ string Assembler::for_begin_handler(string* source, int loc, Funct &f){
 	//int i = 0;
 	for(int i = 0; i < 9; i++)
 		temp_string += temp.at(i);
-	vars_handler(temp_string,1);
+	vars_handler(temp_string,address_offset);
 	//i < 4
 	for(int j = 12; j < 17; j++)
 		if_string += temp.at(j);
-	if_statement_handler(if_string,);
+	if_statement_handler(if_string,address_offset);
 	//i++
 	for(int k = 19; k < 22; k ++)
 		iterate_string += temp.at(k);
 	return iterate_string;
-}
+}*/
  
 /*store c++ instructions*/
 void Assembler::inputSource(const vector<string> newSource)
@@ -132,6 +137,8 @@ bool Assembler::check_leaf_funct() const{
 					check if the variable string is a variable or if it is a array; 
 					extracts data from the string and stores into va 	
 */
+
+
 vector<Var> Assembler::vars_handler(string variable_string, int &address_offset){
 	vector<Var> variables;
 	//string data_type;
@@ -155,7 +162,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 		address_offset *= array_size;
 		int temp_offset = address_offset;
 
-		red_zone_size += array_size;
+		//red_zone_size += array_size;
 		for(int i = 0; i < array_size; i++){
 			Var temp_var;
 			//temp_var.data_type = data_type;
@@ -170,7 +177,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 	}
 	//else variable_string is a single variable
 	else{
-		red_zone_size++;
+		//red_zone_size++;
 		Var temp_var;
 
 		//get the variable type
@@ -198,6 +205,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 	return variables;
 }
 
+
 vector<int> Assembler::split(string str){
 	//{11,2,30}
 	vector<int> int_values;
@@ -214,9 +222,13 @@ vector<int> Assembler::split(string str){
 	return int_values;
 }
 
+void Assembler::function_handler(){
+
+}
+/*
 int Assembler::red_zone(){
 	return red_zone_size*4;
-}
+}*/
 //test function
 void Assembler::test_var_handler(string str, int offset){
 	vector<Var> test_var = vars_handler(str, offset);
@@ -227,5 +239,55 @@ void Assembler::test_var_handler(string str, int offset){
 		cout <<" address_offset is " << test_var[i].address_offset << endl;
 		cout << endl;
 	}
+}
+
+//alternative version start here
+void Assembler::variables_handler_versionTwo(){
+	int main_start = find_main_start();
+	int main_end = find_main_end();
+	vector<string> variables_str;
+	for(int i = main_start; i < main_end; i++){
+		if(source[i].find("int") == 0){
+			cout << source[i] << endl;
+		}
+	}
+
+/*
+	vector<Var>temp;
+	for(int i = main_start; i < main_end-1; i++){
+		temp = vars_handler(source[i], address_offset);
+		variables_information.push_back(temp);
+	}
+	
+	for(int i =0; i < variables_information.size(); i++){
+		for(int j = 0; j < variables_information[i].size(); j++){
+			cout << "data type is "<<variables_information[i][j].data_type << endl;
+		}
+	}
+*/	
+}
+
+int Assembler::find_main_start(){
+	int main_start = 0;
+	for(int i = 0; i < source.size(); i++){
+		if(source[i] == "int main()"){
+			main_start = i+2;
+			break;
+		}
+		
+	}
+	return main_start;
+}
+
+int Assembler::find_main_end(){
+	int main_start = find_main_start();
+	int main_end;
+	for(int i = main_start; i < source.size(); i++){
+		if(source[i] == "}"){
+			main_end = i;
+			break;
+		}
+	}
+	return main_end;
 }
 
