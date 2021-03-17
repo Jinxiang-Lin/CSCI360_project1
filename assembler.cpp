@@ -160,7 +160,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 		variable_name = variable_string[index];
 
 		//address_offset *= array_size;
-		int temp_offset = address_offset;
+		//int temp_offset = address_offset;
 
 		//red_zone_size += array_size;
 		for(int i = 0; i < array_size; i++){
@@ -173,7 +173,6 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 			address_offset -= 4;
 			variables.push_back(temp_var);
 		}
-		address_offset = temp_offset -4;
 	}
 	//else variable_string is a single variable
 	else{
@@ -243,6 +242,7 @@ void Assembler::test_var_handler(string str, int offset){
 
 //alternative version start here
 void Assembler::variables_handler_versionTwo(){
+
 	int main_start = find_main_start();
 	int main_end = find_main_end();
 	vector<string> variables_str;
@@ -295,4 +295,5 @@ int Assembler::find_main_end(){
 	}
 	return main_end;
 }
+// alternative version end here;
 

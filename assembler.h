@@ -59,9 +59,8 @@ public:
 private:
 	vector<string>source;
 	vector<Funct> functions;
-
-	/*variables section*/
 	int address_offset = -4;
+	/*variables section*/
 	vector<string>assembly_instructions_for_variables;
 	vector<vector<Var>> variables_information;
 
