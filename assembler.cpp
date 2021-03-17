@@ -259,6 +259,8 @@ void Assembler::variables_handler_versionTwo(){
 		variables_information.push_back(temp);
 	}
 	
+}
+void Assembler::print_variable_information(){
 	for(int i =0; i < variables_information.size(); i++){
 		for(int j = 0; j < variables_information[i].size(); j++){
 			cout << "data type is "<<variables_information[i][j].data_type << endl;
@@ -268,7 +270,6 @@ void Assembler::variables_handler_versionTwo(){
 			cout << endl;
 		}
 	}
-	
 }
 
 int Assembler::find_main_start(){

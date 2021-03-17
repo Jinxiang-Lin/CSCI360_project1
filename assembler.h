@@ -55,6 +55,7 @@ public:
  	void variables_handler_versionTwo();
  	int find_main_start();
  	int find_main_end();
+ 	void print_variable_information();
 private:
 	vector<string>source;
 	vector<Funct> functions;
