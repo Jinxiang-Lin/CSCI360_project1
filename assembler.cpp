@@ -2,7 +2,6 @@
 
 Assembler::Assembler(){}
 
-
 string Assembler::add_mov(string source, string dest, int size){
     string opcode;
 	if(size == 64){
@@ -22,7 +21,7 @@ int Assembler::get_offset(string name, vector<Var> variable){
 	return -1;
 }
 
-void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
+void Assembler::arithmetic_handler(int loc, Funct &f1){
 	vector<string> temp; 
 	// split by equal sign
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '=');
@@ -76,7 +75,7 @@ void Assembler::arithmetic_handler(string* source, int loc, Funct &f1){
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
 
-string Assembler::for_begin_handler(string* source, int loc, Funct &f){
+string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	vector<string> temp; 
 	// split by equal sign
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
@@ -87,17 +86,31 @@ string Assembler::for_begin_handler(string* source, int loc, Funct &f){
 	//int i = 0;
 	for(int i = 0; i < 9; i++)
 		temp_string += temp.at(i);
-	vars_handler(temp_string,address_offset);
+	int offset = get_offset(temp.at(5),f.vars);	
+	vars_handler(temp_string,offset);
+	for(auto & var: f.vars){
+		string source = to_string(var.data_value);
+		string dest1 = to_string(var.address_offset)+"(%rbp)";
+		f.assembly_instructions.push_back(add_mov(source, dest1, 32));
+	}
 	//i < 4
-	for(int j = 12; j < 17; j++)
-		if_string += temp.at(j);
-	if_statement_handler(if_string,);
+	f.assembly_instructions.push_back(".BEGIN" + n);
+	for (auto & var : f.vars){
+		if(var.variables_name == temp.at(12)){
+			string dest = to_string(var.address_offset)+"(%rbp)";
+			f.assembly_instructions.push_back("cmpl" + ' $' + temp.at(17) + ", " +  dest);
+		}
+	}
 	//i++
 	for(int k = 19; k < 22; k ++)
 		iterate_string += temp.at(k);
 	return iterate_string;
 }
- 
+
+void Assembler::if_statement_handler(string input, int loc, Funct &f){
+	vector<string> temp;
+	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
+}
 /*store c++ instructions*/
 void Assembler::inputSource(const vector<string> newSource)
 {
@@ -185,6 +198,7 @@ vector<Var> Assembler::vars_handler(string variable_string, int &address_offset)
 
 		//get the value
 		temp_var.data_value = stoi(variable_string.substr(variable_string.find('=')+1, variable_string.length()));
+
 
 		//get the offset
 		temp_var.address_offset = address_offset;

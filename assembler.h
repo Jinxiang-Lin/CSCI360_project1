@@ -33,8 +33,9 @@ public:
 	Assembler();
 	string add_mov(string source, string destination, int size);
 	int get_offset(string name, vector<Var> variables);
-	void arithmetic_handler(string* source, int loc, Funct &f);
-	string for_begin_handler(string* source, int loc, Funct &f);
+	void arithmetic_handler(int loc, Funct &f);
+	string for_begin_handler(int loc, Funct &f, int n);
+	void if_statement_handler(string input, int loc, Funct &f);
 	/*store c++ instructions*/
 	void inputSource(const vector<string> newSource);
 	/*print c++ instructions*/
