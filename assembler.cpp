@@ -84,8 +84,12 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	string if_string;
 	string iterate_string;
 	//int i = 0;
-	for(int i = 0; i < 9; i++)
+	int i = 0;
+	while(temp.at(i) != ";"){
 		temp_string += temp.at(i);
+		i++;
+	}
+		
 	int offset = get_offset(temp.at(5),f.vars);	
 	vars_handler(temp_string,offset);
 	for(auto & var: f.vars){
@@ -110,7 +114,38 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 void Assembler::if_statement_handler(string input, int loc, Funct &f){
 	vector<string> temp;
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
+	string temp1;
+	int arr_value1;
+	int arr_address_offset1;
+	int arr_value2;
+	int arr_address_offset2;
+	int i = 0;
+	while(temp.at(i) != ")"){
+		temp1 += temp.at(i);
+		i++;
+	}
+	for (auto & var : f.vars){
+		if(var.variables_name == temp.at(2)){
+			arr_value1 = var.data_value;
+			arr_address_offset1 = var.address_offset;
+		}
+	}
+	f.assembly_instructions.push_back(add_mov(arr_address_offset1 + "(%rbp", "%eax", 32));
+	f.assembly_instructions.push_back("cltq");
+	f.assembly_instructions.push_back(add_mov("0(%rbp,%rax,4)", "%eax", 32));
+	for (auto & var : f.vars){
+		if(var.variables_name == temp.at(9)){
+			arr_value2 = var.data_value;
+			arr_address_offset2 = var.address_offset;
+		}
+	}
+	f.assembly_instructions.push_back(add_mov(arr_address_offset2 + "(%rbp", "%eax", 32));
+	f.assembly_instructions.push_back("cltq");
+	f.assembly_instructions.push_back(add_mov("0(%rbp,%rax,4)", "%eax", 32));
+	f.assembly_instructions.push_back("cmpl " + 'edx, eax');
+	f.assembly_instructions.push_back("jge .IF");
 }
+
 /*store c++ instructions*/
 void Assembler::inputSource(const vector<string> newSource)
 {
