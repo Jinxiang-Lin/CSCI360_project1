@@ -248,13 +248,14 @@ void Assembler::function_handler(){
 	/*section 1: handling variables and function*/
 	Funct f;
 	variables_handler_versionTwo(f);
+	/*main function*/
 	f.assembly_instructions.push_back("main:");
-
 	f.assembly_instructions.push_back("\tpushq %rbp");
 	f.assembly_instructions.push_back("\tmovq  %rsp, %rbp");
 
 	if(check_leaf_funct() == 1) { f.assembly_instructions.push_back("\tsubq  $48, %rbp"); }
 
+	/*all variables assignment to assembly*/
 	for(int i = 0; i < f.vars.size(); i++){
 		for(int j = 0; j < f.vars[i].size(); j++){
 			string source = to_string(f.vars[i][j].data_value);
