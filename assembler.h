@@ -24,7 +24,8 @@ struct Funct{
 	string function_name;
 	string function_return_type;
 	vector<Parameter> parameters;
-	vector<vector<Var>> vars;
+	vector<Var>vars;
+	vector<vector<Var>> vars_storage;
 	vector<string> assembly_instructions;
 };
 
@@ -57,6 +58,7 @@ public:
  	int find_main_start();
  	int find_main_end();
  	void print_variable_information(Funct &funct);
+ 	void print_vars(Funct &funct);
 private:
 	vector<string>source;
 	vector<Funct> functions;
