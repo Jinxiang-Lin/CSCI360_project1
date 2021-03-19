@@ -13,10 +13,10 @@ string Assembler::add_mov(string source, string dest, int size){
 } 
 
 
-int Assembler::get_offset(string name, vector<Var> variable){
-	for (auto & var : variable) {
-		if(var.variables_name == name){
-			return var.address_offset;
+int Assembler::get_offset(string name, Funct &f){
+	for (int i = 0; i < f.vars.size(); i++) {
+		if(f.vars[i].variables_name == name){
+			return f.vars[i].address_offset;
 		}
 	}
 	return -1;
@@ -29,7 +29,7 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	// get output name
 	string output_name = temp.at(0);
 	// get output offset
-	int output_offset = get_offset(output_name, f1.vars);
+	int output_offset = get_offset(output_name, f1);
 
 	string op1, op2, op_string;
 	char operation;
@@ -52,7 +52,7 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	op1 = operands.at(0);
 	op2 = operands.at(1);
 
-	int op1_offset = get_offset(op1, f1.vars);
+	int op1_offset = get_offset(op1, f1);
 	string op_source1;
 	if(op1_offset == -1){
 		op_source1 = "$"+op1;
@@ -62,7 +62,7 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	string dest1 = "eax";
 	f1.assembly_instructions.push_back(add_mov(op_source1, dest1, 32)); 
 
-	int op2_offset = get_offset(op2, f1.vars);
+	int op2_offset = get_offset(op2, f1);
 	string op_source2;
 	if(op2_offset == -1){
 		op_source2 = "$"+op2;
@@ -150,9 +150,9 @@ bool Assembler::check_leaf_funct() const{
 	
 	for(auto &x : source){
 		if(regex_match(x, function_check))
-		 	return 1;
+		 	return 0;
 	}
-	return 0;
+	return 1;
 }
 
 /*variable_handler: read a variable string; 
@@ -253,7 +253,7 @@ void Assembler::function_handler(){
 	f.assembly_instructions.push_back("\tpushq %rbp");
 	f.assembly_instructions.push_back("\tmovq  %rsp, %rbp");
 
-	if(check_leaf_funct() == 1) { f.assembly_instructions.push_back("\tsubq  $48, %rbp"); }
+	if(check_leaf_funct() == 0) { f.assembly_instructions.push_back("\tsubq  $48, %rbp"); }
 
 	/*all variables assignment to assembly*/
 	for(int i = 0; i < f.vars_storage.size(); i++){
@@ -265,6 +265,65 @@ void Assembler::function_handler(){
 			f.vars.push_back(f.vars_storage[i][j]);
 		}
 	}
+
+	//check if main calls another function
+	if(check_leaf_funct() == 0){
+		string function_head = source[0];
+		string return_type = function_head.substr(0, function_head.find(' '));
+		string temp = function_head.substr(function_head.find(' ')+1, function_head.length());
+		string function_name = temp.substr(0, temp.find('('));
+		//cout << return_type << " " << function_name << endl;
+		int main_start = find_main_start();
+		int main_end = find_main_end();
+		int function_call_index;
+
+		for(int i = main_start; i < main_end; i++){
+			if(source[i].find(function_name)){
+				function_call_index = i;
+			}
+		}
+		string parameters_str = source[0].substr(source[0].find('(')+1, source[0].find(')')-source[0].find('(')-1);
+		//cout << parameters_str << endl;
+
+		vector<string>parameters;
+		DataConverter::split(parameters_str, parameters, ',');
+		if(parameters.size() > 6){
+			string argument[6] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
+			int offset;
+			for(int i = 0; i < 6; i++){
+
+				if(parameters[i].length() == 5){
+					//string name1 = "a";
+					string name(1, parameters[i][4]);
+					offset = get_offset(name,f);
+					Parameter p;
+
+					p.argument_name = argument[i];
+					p.address_offset = offset;
+
+					f.parameters.push_back(p);
+
+				}
+				else{
+					string name(1, parameters[i][4]);
+					offset = get_offset(name,f);
+					Parameter p;
+
+					p.argument_name = argument[i];
+					p.address_offset = offset;
+
+					f.parameters.push_back(p);
+				}
+			}
+		}
+		//cout << source[function_call_index] << endl;
+
+	}
+	for(int i = 0; i < f.parameters.size(); i++){
+		cout << f.parameters[i].argument_name << endl;
+		cout << f.parameters[i].address_offset << endl;
+	}
+
 	//print_assembly_instructions(f);
 	//print_variable_information(f);
 	//print_vars(f);

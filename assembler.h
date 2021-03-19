@@ -16,8 +16,8 @@ struct Var{
 };
 
 struct Parameter{
-	string parameter_name;
-	int value;
+	string argument_name;
+	int address_offset;
 };
 
 struct Funct{
@@ -33,7 +33,7 @@ class Assembler{
 public:
 	Assembler();
 	string add_mov(string source, string destination, int size);
-	int get_offset(string name, vector<Var> variables);
+	int get_offset(string name, Funct &f);
 	void arithmetic_handler(int loc, Funct &f);
 	string for_begin_handler(int loc, Funct &f, int n);
 	void if_statement_handler(string input, int loc, Funct &f);
