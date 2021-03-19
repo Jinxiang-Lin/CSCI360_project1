@@ -24,7 +24,7 @@ struct Funct{
 	string function_name;
 	string function_return_type;
 	vector<Parameter> parameters;
-	vector<Var> vars;
+	vector<vector<Var>> vars;
 	vector<string> assembly_instructions;
 };
 
@@ -47,23 +47,23 @@ public:
  	vector<int> split(string str);
  	void test_var_handler(string str, int offset);
  	void function_handler();
-
+ 	void print_assembly_instructions(Funct &funct);
  	/*this is the alternative for handling variables
  	  it'll read through the main.cpp and finds all variables
  	  assignment. this stores all variables information to variables_information vector
  	  and translates them to assembly.
  	*/
- 	void variables_handler_versionTwo();
+ 	void variables_handler_versionTwo(Funct &funct);
  	int find_main_start();
  	int find_main_end();
- 	void print_variable_information();
+ 	void print_variable_information(Funct &funct);
 private:
 	vector<string>source;
 	vector<Funct> functions;
 	int address_offset = -4;
 	/*variables section*/
-	vector<string>assembly_instructions_for_variables;
-	vector<vector<Var>> variables_information;
+	//vector<string>assembly_instructions_for_variables;
+	//vector<vector<Var>> variables_information;
 
 	//int red_zone_size = 0;
 	/*rbp: base pointer during function calls

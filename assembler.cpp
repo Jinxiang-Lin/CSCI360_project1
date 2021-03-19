@@ -21,7 +21,7 @@ int Assembler::get_offset(string name, vector<Var> variable){
 	}
 	return -1;
 }
-
+/*
 void Assembler::arithmetic_handler(int loc, Funct &f1){
 	vector<string> temp; 
 	// split by equal sign
@@ -77,7 +77,7 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	string dest3 = to_string(output_offset)+"(%rbp)";
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
-
+*/
 /*
 string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	vector<string> temp; 
@@ -245,7 +245,36 @@ vector<int> Assembler::split(string str){
 }
 
 void Assembler::function_handler(){
+	/*section 1: handling variables and function*/
+	Funct f;
+	variables_handler_versionTwo(f);
+	f.assembly_instructions.push_back("main:");
 
+	f.assembly_instructions.push_back("\tpushq %rbp");
+	f.assembly_instructions.push_back("\tmovq  %rsp, %rbp");
+
+	if(check_leaf_funct() == 1) { f.assembly_instructions.push_back("\tsubq  $48, %rbp"); }
+
+	for(int i = 0; i < f.vars.size(); i++){
+		for(int j = 0; j < f.vars[i].size(); j++){
+			string source = to_string(f.vars[i][j].data_value);
+			source = "$"+source;
+			string dest = to_string(f.vars[i][j].address_offset) + "(%rbp)";
+			f.assembly_instructions.push_back("\t"+add_mov(source, dest, 32));
+		}
+	}
+	print_assembly_instructions(f);
+	//print_variable_information(f);
+
+
+
+	/*section 2: handling loop and condition*/
+
+}
+
+void Assembler::print_assembly_instructions(Funct &funct){
+	for(auto x : funct.assembly_instructions)
+		cout << x << endl;
 }
 /*
 int Assembler::red_zone(){
@@ -264,7 +293,7 @@ void Assembler::test_var_handler(string str, int offset){
 }
 
 //alternative version start here
-void Assembler::variables_handler_versionTwo(){
+void Assembler::variables_handler_versionTwo(Funct &funct){
 
 	int main_start = find_main_start();
 	int main_end = find_main_end();
@@ -279,17 +308,18 @@ void Assembler::variables_handler_versionTwo(){
 	vector<Var>temp;
 	for(int i = 0; i < variables_str.size(); i++){
 		temp = vars_handler(variables_str[i], address_offset);
-		variables_information.push_back(temp);
+		//variables_information.push_back(temp);
+		funct.vars.push_back(temp);
 	}
 	
 }
-void Assembler::print_variable_information(){
-	for(int i =0; i < variables_information.size(); i++){
-		for(int j = 0; j < variables_information[i].size(); j++){
-			cout << "data type is "<<variables_information[i][j].data_type << endl;
-			cout << "variable_name is "<<variables_information[i][j].variables_name<<endl;
-			cout << "value is "<<variables_information[i][j].data_value << endl;
-			cout << "address_offset is" << variables_information[i][j].address_offset<<endl;
+void Assembler::print_variable_information(Funct &funct){
+	for(int i =0; i < funct.vars.size(); i++){
+		for(int j = 0; j < funct.vars[i].size(); j++){
+			cout << "data type is "<<funct.vars[i][j].data_type << endl;
+			cout << "variable_name is "<<funct.vars[i][j].variables_name<<endl;
+			cout << "value is "<<funct.vars[i][j].data_value << endl;
+			cout << "address_offset is" << funct.vars[i][j].address_offset<<endl;
 			cout << endl;
 		}
 	}

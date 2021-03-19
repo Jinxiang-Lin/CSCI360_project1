@@ -27,8 +27,7 @@ int main(){
 	Assembler assembler;
 	assembler.inputSource(source);
 	assembler.printSource();
-	assembler.variables_handler_versionTwo();
-	assembler.print_variable_information();
+	assembler.function_handler();
 	
 /*
 	//here is only for testing function
