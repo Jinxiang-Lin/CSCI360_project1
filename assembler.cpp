@@ -21,7 +21,7 @@ int Assembler::get_offset(string name, vector<Var> variable){
 	}
 	return -1;
 }
-/*
+
 void Assembler::arithmetic_handler(int loc, Funct &f1){
 	vector<string> temp; 
 	// split by equal sign
@@ -77,7 +77,7 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	string dest3 = to_string(output_offset)+"(%rbp)";
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
-*/
+
 /*
 string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	vector<string> temp; 
@@ -267,7 +267,7 @@ void Assembler::function_handler(){
 	}
 	//print_assembly_instructions(f);
 	//print_variable_information(f);
-	print_vars(f);
+	//print_vars(f);
 
 
 	/*section 2: handling loop and condition*/
@@ -316,7 +316,7 @@ void Assembler::variables_handler_versionTwo(Funct &funct){
 	
 }
 void Assembler::print_variable_information(Funct &funct){
-	for(int i =0; i < funct.vars.size(); i++){
+	for(int i =0; i < funct.vars_storage.size(); i++){
 		for(int j = 0; j < funct.vars_storage[i].size(); j++){
 			cout << "data type is "<<funct.vars_storage[i][j].data_type << endl;
 			cout << "variable_name is "<<funct.vars_storage[i][j].variables_name<<endl;
