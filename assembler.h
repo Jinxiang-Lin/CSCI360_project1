@@ -49,7 +49,8 @@ public:
  	void test_var_handler(string str, int offset);
  	void function_handler();
  	void print_assembly_instructions(Funct &funct);
- 	/*this is the alternative for handling variables
+
+ 	/*for handling variables
  	  it'll read through the main.cpp and finds all variables
  	  assignment. this stores all variables information to variables_information vector
  	  and translates them to assembly.
