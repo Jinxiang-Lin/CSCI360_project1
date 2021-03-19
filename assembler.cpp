@@ -259,7 +259,7 @@ void Assembler::function_handler(){
 	for(int i = 0; i < f.vars_storage.size(); i++){
 		for(int j = 0; j < f.vars_storage[i].size(); j++){
 			string source = to_string(f.vars_storage[i][j].data_value);
-			source = "$"+source;
+			source = " $"+source;
 			string dest = to_string(f.vars_storage[i][j].address_offset) + "(%rbp)";
 			f.assembly_instructions.push_back("\t"+add_mov(source, dest, 32));
 			f.vars.push_back(f.vars_storage[i][j]);
@@ -290,41 +290,99 @@ void Assembler::function_handler(){
 		if(parameters.size() > 6){
 			string argument[6] = {"edi", "esi", "edx", "ecx", "r8d", "r9d"};
 			int offset;
+
+			//push the first 6 to arguments;
 			for(int i = 0; i < 6; i++){
 
 				if(parameters[i].length() == 5){
 					//string name1 = "a";
 					string name(1, parameters[i][4]);
 					offset = get_offset(name,f);
-					Parameter p;
 
+					Parameter p;
+					p.variables_name = name;
 					p.argument_name = argument[i];
 					p.address_offset = offset;
-
 					f.parameters.push_back(p);
+
+					string offset_str = to_string(offset);
+					string temp = "\tmovl  ";
+					temp.append(offset_str);
+					temp.append("(%rbp), ");
+					temp.append("%");
+					temp.append(argument[i]);
+					f.assembly_instructions.push_back(temp);
 
 				}
 				else{
 					string name(1, parameters[i][4]);
 					offset = get_offset(name,f);
-					Parameter p;
 
+					Parameter p;
+					p.variables_name = name;
 					p.argument_name = argument[i];
 					p.address_offset = offset;
-
 					f.parameters.push_back(p);
+
+					string offset_str = to_string(offset);
+					string temp = "\tlevl  ";
+					temp.append(offset_str);
+					temp.append("(%rbp), ");
+					temp.append("%");
+					temp.append(argument[i]);
+					f.assembly_instructions.push_back(temp);
 				}
 			}
+			for(int i = 6; i < parameters.size(); i++){
+				if(parameters[i].length() == 5){
+					//string name1 = "a";
+					string name(1, parameters[i][4]);
+					offset = get_offset(name,f);
+
+					Parameter p;
+					p.variables_name = name;
+					p.argument_name = "";
+					p.address_offset = offset;
+					f.rest_p.push_back(p);
+
+					string offset_str = to_string(offset);
+					string temp = "\tpushq  ";
+					temp.append(offset_str);
+					temp.append("(%rbp)");
+					f.assembly_instructions.push_back(temp);
+
+				}
+				else{
+					string name(1, parameters[i][4]);
+					offset = get_offset(name,f);
+
+					Parameter p;
+					p.variables_name = name;
+					p.argument_name = "";
+					p.address_offset = offset;
+					f.rest_p.push_back(p);
+
+					string offset_str = to_string(offset);
+					string temp = "\tpushq  ";
+					temp.append(offset_str);
+					temp.append("(%rbp)");
+					
+					f.assembly_instructions.push_back(temp);
+				}				
+			}
+
 		}
 		//cout << source[function_call_index] << endl;
 
 	}
+	/*
 	for(int i = 0; i < f.parameters.size(); i++){
+		cout << f.parameters[i].variables_name << endl;
 		cout << f.parameters[i].argument_name << endl;
 		cout << f.parameters[i].address_offset << endl;
-	}
+	}*/
 
-	//print_assembly_instructions(f);
+	print_assembly_instructions(f);
 	//print_variable_information(f);
 	//print_vars(f);
 

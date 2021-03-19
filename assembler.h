@@ -15,7 +15,9 @@ struct Var{
 	int address_offset;
 };
 
+
 struct Parameter{
+	string variables_name;
 	string argument_name;
 	int address_offset;
 };
@@ -23,7 +25,11 @@ struct Parameter{
 struct Funct{
 	string function_name;
 	string function_return_type;
+
+	//store first 6 parameters;
 	vector<Parameter> parameters;
+	//store rest of the parameters;
+	vector<Parameter> rest_p;
 	vector<Var>vars;
 	vector<vector<Var>> vars_storage;
 	vector<string> assembly_instructions;
