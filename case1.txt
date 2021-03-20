@@ -1,10 +1,10 @@
 int test(int a,int b,int c,int d,int e[3],int f,int g,int h[2])
 {
 int i = 0;
-a = c + b;
-d = a * g;
-f = d - e[i];
-i = f + h[i];
+a=c+b;
+d=a*g;
+f=d-e[i];
+i=f+h[i];
 return i;
 }
 int main()

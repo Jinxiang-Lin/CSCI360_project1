@@ -333,6 +333,7 @@ void Assembler::function_handler(){
 					f.assembly_instructions.push_back(temp);
 				}
 			}
+			//push the rest of arguments
 			for(int i = 6; i < parameters.size(); i++){
 				if(parameters[i].length() == 5){
 					//string name1 = "a";
@@ -372,7 +373,49 @@ void Assembler::function_handler(){
 			}
 
 		}
-		//cout << source[function_call_index] << endl;
+		f.assembly_instructions.push_back("\tcall   " + function_name);
+		f.assembly_instructions.push_back("\tadd   rsp, 16");
+		f.assembly_instructions.push_back("\tmovl  eax, -48(%rbp)");
+		f.assembly_instructions.push_back("\tmovl  $0, %eax");
+		f.assembly_instructions.push_back("\tleave");
+		f.assembly_instructions.push_back("\tret");
+		
+		//test function start here;
+		
+		f.assembly_instructions.push_back(function_name+":");
+		f.assembly_instructions.push_back("\tpushq  rbp");
+		f.assembly_instructions.push_back("\tmovq  %rsp, %rbp");
+		int loc = 2;
+		int add_offset2 = -4;
+		for(int i = 0; i < f.parameters.size(); i++){
+			string argument = "%";
+			argument += f.parameters[i].argument_name;
+			string address_offset =to_string(add_offset2);
+			address_offset +="(%rbp)";
+			f.assembly_instructions.push_back("\tmovl  "+argument+ " " +address_offset);
+			add_offset2 -=4;
+		}
+		while(source[loc] != "}"){
+			if(source[loc].find("int") == 0){
+				vector<Var> vars = vars_handler(source[loc], add_offset2);
+				for(auto & var : vars){
+					f.vars.push_back(var);
+					string source = "$";
+					 source+= to_string(var.data_value);
+					string dest = to_string(var.address_offset)+"(%rbp)";
+					f.assembly_instructions.push_back("\t"+add_mov(source, dest, 32));
+				}
+				loc++;
+			}
+			else if(source[loc].find("return") == 0){
+				loc++;
+			}
+			else{
+				//arithmetic_handler(loc, f);
+				loc++;
+			}
+
+		}
 
 	}
 	/*
