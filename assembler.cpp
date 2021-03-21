@@ -53,6 +53,7 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	op2 = operands.at(1);
 
 	int op1_offset = get_offset(op1, f1);
+	
 	string op_source1;
 	if(op1_offset == -1){
 		op_source1 = "$"+op1;
@@ -63,14 +64,24 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	f1.assembly_instructions.push_back(add_mov(op_source1, dest1, 32)); 
 
 	int op2_offset = get_offset(op2, f1);
+	
 	string op_source2;
 	if(op2_offset == -1){
-		op_source2 = "$"+op2;
+		//op_source2 = "$"+op2;
+		
+		int index_offset = -28;
+		string index_offset_str = to_string(index_offset);
+		f1.assembly_instructions.push_back("movl "+index_offset_str+"(%rbp),%edx");
+		f1.assembly_instructions.push_back("cltq");
+		string new_op2(1,op2[0]);
+		int op2_arr_offset = get_offset(new_op2, f1);
+		string offset_str = to_string(op2_arr_offset);
+		op_source2 = offset_str + "(%rbp,rax,4)";
 	}else{
 		op_source2 = to_string(op2_offset)+"(%rbp)";
 	}
 	string dest2 = "edx";
-	f1.assembly_instructions.push_back(add_mov(op_source1, dest1, 32)); 
+	f1.assembly_instructions.push_back(add_mov(op_source2, dest2, 32)); 
 
 	f1.assembly_instructions.push_back(op_string + " edx,eax");
 	string op_source3 = "%eax";
@@ -250,10 +261,10 @@ void Assembler::function_handler(){
 	variables_handler_versionTwo(f);
 	/*main function*/
 	f.assembly_instructions.push_back("main:");
-	f.assembly_instructions.push_back("\tpushq %rbp");
-	f.assembly_instructions.push_back("\tmovq  %rsp, %rbp");
+	f.assembly_instructions.push_back("pushq %rbp");
+	f.assembly_instructions.push_back("movq  %rsp, %rbp");
 
-	if(check_leaf_funct() == 0) { f.assembly_instructions.push_back("\tsubq  $48, %rbp"); }
+	if(check_leaf_funct() == 0) { f.assembly_instructions.push_back("subq  $48, %rbp"); }
 
 	/*all variables assignment to assembly*/
 	for(int i = 0; i < f.vars_storage.size(); i++){
@@ -261,7 +272,7 @@ void Assembler::function_handler(){
 			string source = to_string(f.vars_storage[i][j].data_value);
 			source = " $"+source;
 			string dest = to_string(f.vars_storage[i][j].address_offset) + "(%rbp)";
-			f.assembly_instructions.push_back("\t"+add_mov(source, dest, 32));
+			f.assembly_instructions.push_back(add_mov(source, dest, 32));
 			f.vars.push_back(f.vars_storage[i][j]);
 		}
 	}
@@ -306,7 +317,7 @@ void Assembler::function_handler(){
 					f.parameters.push_back(p);
 
 					string offset_str = to_string(offset);
-					string temp = "\tmovl  ";
+					string temp = "movl  ";
 					temp.append(offset_str);
 					temp.append("(%rbp), ");
 					temp.append("%");
@@ -325,7 +336,7 @@ void Assembler::function_handler(){
 					f.parameters.push_back(p);
 
 					string offset_str = to_string(offset);
-					string temp = "\tlevl  ";
+					string temp = "levl  ";
 					temp.append(offset_str);
 					temp.append("(%rbp), ");
 					temp.append("%");
@@ -347,7 +358,7 @@ void Assembler::function_handler(){
 					f.rest_p.push_back(p);
 
 					string offset_str = to_string(offset);
-					string temp = "\tpushq  ";
+					string temp = "pushq  ";
 					temp.append(offset_str);
 					temp.append("(%rbp)");
 					f.assembly_instructions.push_back(temp);
@@ -364,7 +375,7 @@ void Assembler::function_handler(){
 					f.rest_p.push_back(p);
 
 					string offset_str = to_string(offset);
-					string temp = "\tpushq  ";
+					string temp = "pushq  ";
 					temp.append(offset_str);
 					temp.append("(%rbp)");
 					
@@ -373,18 +384,18 @@ void Assembler::function_handler(){
 			}
 
 		}
-		f.assembly_instructions.push_back("\tcall   " + function_name);
-		f.assembly_instructions.push_back("\tadd   rsp, 16");
-		f.assembly_instructions.push_back("\tmovl  eax, -48(%rbp)");
-		f.assembly_instructions.push_back("\tmovl  $0, %eax");
-		f.assembly_instructions.push_back("\tleave");
-		f.assembly_instructions.push_back("\tret");
+		f.assembly_instructions.push_back("call   " + function_name);
+		f.assembly_instructions.push_back("add   rsp, 16");
+		f.assembly_instructions.push_back("movl  eax, -48(%rbp)");
+		f.assembly_instructions.push_back("movl  $0, %eax");
+		f.assembly_instructions.push_back("leave");
+		f.assembly_instructions.push_back("ret");
 		
 		//test function start here;
 		
 		f.assembly_instructions.push_back(function_name+":");
-		f.assembly_instructions.push_back("\tpushq  rbp");
-		f.assembly_instructions.push_back("\tmovq  %rsp, %rbp");
+		f.assembly_instructions.push_back("pushq  rbp");
+		f.assembly_instructions.push_back("movq  %rsp, %rbp");
 		int loc = 2;
 		int add_offset2 = -4;
 		for(int i = 0; i < f.parameters.size(); i++){
@@ -392,18 +403,20 @@ void Assembler::function_handler(){
 			argument += f.parameters[i].argument_name;
 			string address_offset =to_string(add_offset2);
 			address_offset +="(%rbp)";
-			f.assembly_instructions.push_back("\tmovl  "+argument+ " " +address_offset);
+			f.assembly_instructions.push_back("movl  "+argument+ " " +address_offset);
 			add_offset2 -=4;
 		}
+
 		while(source[loc] != "}"){
 			if(source[loc].find("int") == 0){
 				vector<Var> vars = vars_handler(source[loc], add_offset2);
 				for(auto & var : vars){
 					f.vars.push_back(var);
 					string source = "$";
-					 source+= to_string(var.data_value);
+					source+= to_string(var.data_value);
 					string dest = to_string(var.address_offset)+"(%rbp)";
-					f.assembly_instructions.push_back("\t"+add_mov(source, dest, 32));
+					f.assembly_instructions.push_back(""+add_mov(source, dest, 32));
+					
 				}
 				loc++;
 			}
@@ -411,7 +424,7 @@ void Assembler::function_handler(){
 				loc++;
 			}
 			else{
-				//arithmetic_handler(loc, f);
+				arithmetic_handler(loc, f);
 				loc++;
 			}
 
