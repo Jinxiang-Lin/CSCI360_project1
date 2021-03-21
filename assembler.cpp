@@ -14,7 +14,7 @@ string Assembler::add_mov(string source, string dest, int size){
 
 
 int Assembler::get_offset(string name, Funct &f){
-	for (int i = 0; i < f.vars.size(); i++) {
+	for (int i = f.vars.size()-1; i >=0; i--) {
 		if(f.vars[i].variables_name == name){
 			return f.vars[i].address_offset;
 		}
@@ -415,12 +415,13 @@ void Assembler::function_handler(){
 					string source = "$";
 					source+= to_string(var.data_value);
 					string dest = to_string(var.address_offset)+"(%rbp)";
-					f.assembly_instructions.push_back(""+add_mov(source, dest, 32));
-					
+					f.assembly_instructions.push_back(add_mov(source, dest, 32));
 				}
 				loc++;
 			}
 			else if(source[loc].find("return") == 0){
+				f.assembly_instructions.push_back("leave");
+				f.assembly_instructions.push_back("ret");
 				loc++;
 			}
 			else{
