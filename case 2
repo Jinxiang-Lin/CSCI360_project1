@@ -21,19 +21,19 @@ main:
         jg      .L3		      // move to l3 if j > 4
         mov     eax, DWORD PTR [rbp-12] // eax = j
         cdqe			      // Convert Doubleword to Quadword
-        mov     edx, DWORD PTR [rbp-48+rax*4] //
+        mov     edx, DWORD PTR [rbp-48+rax*4] // a[j]
         mov     eax, DWORD PTR [rbp-4]
         cdqe
-        mov     eax, DWORD PTR [rbp-48+rax*4]
+        mov     eax, DWORD PTR [rbp-48+rax*4] // a[min_inx]
         cmp     edx, eax
-        jge     .L4
-        mov     eax, DWORD PTR [rbp-12]
-        mov     DWORD PTR [rbp-4], eax
+        jge     .L4			    //jump if a[j] >=a[min_inx]
+        mov     eax, DWORD PTR [rbp-12]	    // eax = j
+        mov     DWORD PTR [rbp-4], eax	    //min_inx = j
 .L4:
-        add     DWORD PTR [rbp-12], 1
+        add     DWORD PTR [rbp-12], 1	    // j+1
         jmp     .L5
 .L3:
-        mov     eax, DWORD PTR [rbp-4]
+        mov     eax, DWORD PTR [rbp-4]	   //eax = 
         cdqe
         mov     eax, DWORD PTR [rbp-48+rax*4]
         mov     DWORD PTR [rbp-16], eax
