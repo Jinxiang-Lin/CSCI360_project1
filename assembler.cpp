@@ -89,54 +89,93 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
 
-/*
 string Assembler::for_begin_handler(int loc, Funct &f, int n){
-	vector<string> temp; 
+	vector<string> temp;
+	vector<string> temp1;
+	vector<Var> variables;
+	string iterate_string; 
+/* 	variables = vars_handler("int i = 0",address_offset);
+	for(auto &vars : variables)
+		f.vars.push_back(vars); */
 	// split by equal sign
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
+	DataConverter::split(temp.at(1).substr(0, source[loc].length()-1), temp, ';');
+	DataConverter::split(temp.at(2).substr(0, source[loc].length()-1), temp1, ')');
 	//int i = 0; i < 4; i++)
 	string temp_string;
 	string if_string;
-	string iterate_string;
-	//int i = 0;
-	int i = 0;
-	while(temp.at(i) != ";"){
-		temp_string += temp.at(i);
-		i++;
-	}
-		
-	int offset = get_offset(temp.at(5),f.vars);	
-	vars_handler(temp_string,offset);
-	for(auto & var: f.vars){
-		string source = to_string(var.data_value);
-		string dest1 = to_string(var.address_offset)+"(%rbp)";
-		f.assembly_instructions.push_back(add_mov(source, dest1, 32));
-	}
-	//i < 4
-
-	for(int j = 12; j < 17; j++)
-		if_string += temp.at(j);
-	if_statement_handler(if_string,address_offset);
-
-	f.assembly_instructions.push_back(".BEGIN" + n);
-	for (auto & var : f.vars){
-		if(var.variables_name == temp.at(12)){
-			string dest = to_string(var.address_offset)+"(%rbp)";
-			f.assembly_instructions.push_back("cmpl" + ' $' + temp.at(17) + ", " +  dest);
+	string var_string;
+	string var_string1;
+	string comp_string;
+	string s;
+	/* temp 
+	int i = 0
+ 	i < 4
+ 	i++) */
+	/* temp1 
+	i++ */
+	//int i = 0
+	//int j = i+1
+	temp_string = temp.at(0);
+	s = temp_string;
+	var_string = temp_string.substr(4,1);	
+	if(temp_string.size() > 9){
+		var_string1 = temp_string.substr(8,1);
+		cout << var_string1 << endl;
+		for(auto & var : f.vars){
+			if(var.variables_name == var_string1){
+				int x = var.data_value + 1;
+				string y = to_string(x);
+				s = temp_string.substr(0,8) + y;
+				string source = to_string(var.address_offset) + "(%rbp)";
+				f.assembly_instructions.push_back(add_mov(source, "%eax", 32));
+				f.assembly_instructions.push_back("addl %eax,1");
+			}
+		}
+		variables = vars_handler(s,address_offset);
+		for (int i = 0; i < variables.size(); i++){
+			if(variables[i].variables_name == var_string){
+				string z = "%eax";
+				z += to_string(variables[i].address_offset);
+				f.assembly_instructions.push_back(add_mov(z,"(%rbp)",32));
+			}
 		}
 	}
-
+	else{
+		variables = vars_handler(s,address_offset);
+		for (int i = 0; i < variables.size(); i++){
+			if(variables[i].variables_name == var_string){
+				string source = "$";
+				source += to_string(variables[i].data_value);
+				string dest = to_string(variables[i].address_offset) + "(%rbp)";
+				f.assembly_instructions.push_back(add_mov(source,dest, 32));
+			}
+		}
+	}
+	//i < 4
+	if_string = temp.at(1);
+	comp_string = if_string.substr(4,if_string.length()-1);
+	int comp = stoi(comp_string);
+	comp --;
+	comp_string = to_string(comp);
+	string n_string = to_string(n);
+	f.assembly_instructions.push_back(".BEGIN" + n_string);
+	string dest = to_string(variables[0].address_offset)+"(%rbp)";
+	f.assembly_instructions.push_back("cmpl $" + comp_string + "," +  dest);
+	f.assembly_instructions.push_back("jg .END" + n_string);
 	//i++
-	for(int k = 19; k < 22; k ++)
-		iterate_string += temp.at(k);
+	iterate_string = temp1.at(0); 
+	for(auto &vars : variables)
+		f.vars.push_back(vars);
 	return iterate_string;
 
-}*/
+}
 
-/*
+
 void Assembler::if_statement_handler(string input, int loc, Funct &f){
 	vector<string> temp;
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
+	DataConverter::split(temp.at(1).substr(0, source[loc].length()-1), temp, '<');
 	string temp1;
 	int arr_value1;
 	int arr_address_offset1;
@@ -168,7 +207,8 @@ void Assembler::if_statement_handler(string input, int loc, Funct &f){
 	f.assembly_instructions.push_back("cmpl " + 'edx, eax');
 	f.assembly_instructions.push_back("jge .IF");
 }
-*/
+
+
 
 /*store c++ instructions*/
 void Assembler::inputSource(const vector<string> newSource)
