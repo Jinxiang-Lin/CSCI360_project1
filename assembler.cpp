@@ -88,7 +88,23 @@ void Assembler::arithmetic_handler(int loc, Funct &f1){
 	string dest3 = to_string(output_offset)+"(%rbp)";
 	f1.assembly_instructions.push_back(add_mov(op_source3, dest3, 32));
 }
-
+void Assembler::arithmetic_string_handler(string source,Funct &f){
+	string input = source.substr(0,1);
+	string operand1 = source.substr(1,1);
+	string op_string;
+	for(auto &var : f.vars){
+		if(input == var.variables_name){
+			if(operand1 == "+")
+				op_string = "addl";
+			else if(operand1 == "-")
+				op_string = "subl";
+			else if(operand1 == "*")
+				op_string = "imul";
+			string address =  to_string(var.address_offset);
+			f.assembly_instructions.push_back(op_string + " " + address + "(%rbp), 1");
+		}
+	}
+}
 string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	vector<string> temp;
 	vector<string> temp1;
@@ -100,7 +116,7 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	// split by equal sign
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
 	DataConverter::split(temp.at(1).substr(0, source[loc].length()-1), temp, ';');
-	DataConverter::split(temp.at(2).substr(0, source[loc].length()-1), temp1, ')');
+	DataConverter::split(temp.at(2).substr(1, source[loc].length()-1), temp1, ')');
 	//int i = 0; i < 4; i++)
 	string temp_string;
 	string if_string;
@@ -121,7 +137,6 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	var_string = temp_string.substr(4,1);	
 	if(temp_string.size() > 9){
 		var_string1 = temp_string.substr(8,1);
-		cout << var_string1 << endl;
 		for(auto & var : f.vars){
 			if(var.variables_name == var_string1){
 				int x = var.data_value + 1;
@@ -141,7 +156,7 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 			}
 		}
 	}
-	else{
+	else if(temp_string.size() <= 9){
 		variables = vars_handler(s,address_offset);
 		for (int i = 0; i < variables.size(); i++){
 			if(variables[i].variables_name == var_string){
@@ -165,47 +180,46 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	f.assembly_instructions.push_back("jg .END" + n_string);
 	//i++
 	iterate_string = temp1.at(0); 
-	for(auto &vars : variables)
+	for(auto &vars : variables){
 		f.vars.push_back(vars);
+	}
 	return iterate_string;
 
 }
 
 
-void Assembler::if_statement_handler(string input, int loc, Funct &f){
+void Assembler::if_statement_handler(int loc, Funct &f, int n){
 	vector<string> temp;
 	DataConverter::split(source[loc].substr(0, source[loc].length()-1), temp, '(');
 	DataConverter::split(temp.at(1).substr(0, source[loc].length()-1), temp, '<');
-	string temp1;
-	int arr_value1;
+	//temp
+	//a[j],a[min_inx])
+	string array1;
+	string array2;
+	array1 = temp.at(0).substr(2,1);
+	array2 = temp.at(1).substr(3,1);
 	int arr_address_offset1;
-	int arr_value2;
 	int arr_address_offset2;
-	int i = 0;
-	while(temp.at(i) != ")"){
-		temp1 += temp.at(i);
-		i++;
-	}
-	for (auto & var : f.vars){
-		if(var.variables_name == temp.at(2)){
-			arr_value1 = var.data_value;
-			arr_address_offset1 = var.address_offset;
+	for(int i = 0; i < f.vars.size();i++){
+		 if(f.vars[i].variables_name == array1){
+			 arr_address_offset1 = f.vars[i].address_offset;
 		}
-	}
-	f.assembly_instructions.push_back(add_mov(arr_address_offset1 + "(%rbp", "%eax", 32));
+		if(f.vars[i].variables_name == array2){
+			arr_address_offset2 = f.vars[i].address_offset;
+	
+		} 
+	} 
+	array1 = to_string(arr_address_offset1);
+	array2 = to_string(arr_address_offset2);
+	f.assembly_instructions.push_back(add_mov(array1 + "(%rbp)", "%eax", 32));
 	f.assembly_instructions.push_back("cltq");
 	f.assembly_instructions.push_back(add_mov("0(%rbp,%rax,4)", "%eax", 32));
-	for (auto & var : f.vars){
-		if(var.variables_name == temp.at(9)){
-			arr_value2 = var.data_value;
-			arr_address_offset2 = var.address_offset;
-		}
-	}
-	f.assembly_instructions.push_back(add_mov(arr_address_offset2 + "(%rbp", "%eax", 32));
+	f.assembly_instructions.push_back(add_mov(array2 + "(%rbp)", "%eax", 32));
 	f.assembly_instructions.push_back("cltq");
 	f.assembly_instructions.push_back(add_mov("0(%rbp,%rax,4)", "%eax", 32));
-	f.assembly_instructions.push_back("cmpl " + 'edx, eax');
-	f.assembly_instructions.push_back("jge .IF");
+	f.assembly_instructions.push_back("cmpl edx, eax");
+	string s = to_string(n);
+	f.assembly_instructions.push_back("jge .IF" + s);  
 }
 
 
@@ -480,7 +494,6 @@ void Assembler::function_handler(){
 			f.assembly_instructions.push_back("movl  "+argument+ " " +address_offset);
 			add_offset2 -=4;
 		}
-
 		while(source[loc] != "}"){
 			if(source[loc].find("int") == 0){
 				vector<Var> vars = vars_handler(source[loc], add_offset2);
@@ -513,13 +526,51 @@ void Assembler::function_handler(){
 		cout << f.parameters[i].address_offset << endl;
 	}*/
 
-	print_assembly_instructions(f);
+	
 	//print_variable_information(f);
 	//print_vars(f);
 
 
 	/*section 2: handling loop and condition*/
-
+	/*main function*/
+	vector<string> iterate;
+	vector<int> arr1;
+	vector<int> arr2;
+	int forif_count = 0;
+	int for_count = 0;
+	int if_count = 0;
+	int loc = 4;
+	while(loc < source.size()){
+		
+		if(source[loc].find("for") == 0){
+				forif_count++;
+				for_count++;
+				iterate.push_back(for_begin_handler(loc,f,for_count));
+				arr1.push_back(find_for_end(forif_count));
+		}
+		else if(source[loc].find("if") == 0){
+				forif_count++;
+				if_count++;
+				if_statement_handler(loc,f,if_count);
+				arr2.push_back(find_for_end(forif_count));
+		} 
+		else if(!arr1.empty() && arr1.at(arr1.size()-1) == loc){
+				arithmetic_string_handler(iterate.at(iterate.size()-1),f);
+				string for_string = to_string(for_count);
+				f.assembly_instructions.push_back("jmp .BEGIN" + for_string);
+				f.assembly_instructions.push_back(".END" + for_string);
+				arr1.pop_back();
+				iterate.pop_back();
+				for_count--;    
+		}
+		else if(!arr2.empty() && arr2.at(arr2.size()-1) == loc){
+			string n = to_string(if_count);
+			f.assembly_instructions.push_back(".IF" + n);
+		}   
+		loc++; 
+	} 
+	print_assembly_instructions(f);
+	
 }
 
 void Assembler::print_assembly_instructions(Funct &funct){
@@ -607,5 +658,22 @@ int Assembler::find_main_end(){
 	}
 	return main_end;
 }
+
+int Assembler::find_for_end(int n){
+	int main_end = find_main_end();
+	int count = 0;
+	int forif_end;
+	for(int i = source.size(); i > 0; i--){
+		if(source[i] == "}"){
+			count++;
+		}
+		if(n < count){
+			forif_end = i;
+			break;
+		}
+	}
+	return forif_end;
+}
+
 // alternative version end here;
 

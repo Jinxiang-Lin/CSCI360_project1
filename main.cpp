@@ -27,11 +27,7 @@ int main(){
 	Assembler assembler;
 	assembler.inputSource(source);
 	assembler.printSource();
-	Funct f; 
-	assembler.for_begin_handler(4,f,1);
-	assembler.for_begin_handler(7,f,2);
-	assembler.print_assembly_instructions(f);
-	//assembler.function_handler();
+	assembler.function_handler();
 	
 	return 0;
 	

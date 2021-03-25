@@ -41,8 +41,9 @@ public:
 	string add_mov(string source, string destination, int size);
 	int get_offset(string name, Funct &f);
 	void arithmetic_handler(int loc, Funct &f);
+	void arithmetic_string_handler(string source,Funct &f);
 	string for_begin_handler(int loc, Funct &f, int n);
-	void if_statement_handler(string input, int loc, Funct &f);
+	void if_statement_handler(int loc, Funct &f, int n);
 	/*store c++ instructions*/
 	void inputSource(const vector<string> newSource);
 	/*print c++ instructions*/
@@ -64,6 +65,7 @@ public:
  	void variables_handler_versionTwo(Funct &funct);
  	int find_main_start();
  	int find_main_end();
+	int find_for_end(int n);
  	void print_variable_information(Funct &funct);
  	void print_vars(Funct &funct);
 private:

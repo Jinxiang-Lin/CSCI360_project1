@@ -8,15 +8,19 @@ main:
         mov     DWORD PTR [rbp-32], 7  //a[4]
         mov     DWORD PTR [rbp-4], 0   //min_inx
         mov     DWORD PTR [rbp-8], 0   // i
-.L6:
+.BEGIN1
         cmp     DWORD PTR [rbp-8], 3   //compare i with 3
         jg      .L2		     // jump to l2 if i > 3
+
+
         mov     eax, DWORD PTR [rbp-8]  // eax = i
-        mov     DWORD PTR [rbp-4], eax  // min_inx = eax
+        mov     DWORD PTR [rbp-4], eax  // min_inx = eax 
+
+        
         mov     eax, DWORD PTR [rbp-8]  // eax = i
         add     eax, 1		      // eax = eax + 1
         mov     DWORD PTR [rbp-12], eax // j = i+1;
-.L5:
+.BEGIN2
         cmp     DWORD PTR [rbp-12], 4   //  compare j with 4
         jg      .L3		      // move to l3 if j > 4
         mov     eax, DWORD PTR [rbp-12] // eax = j
@@ -27,29 +31,40 @@ main:
         mov     eax, DWORD PTR [rbp-48+rax*4] // a[min_inx]
         cmp     edx, eax
         jge     .L4			    //jump if a[j] >=a[min_inx]
+
+
         mov     eax, DWORD PTR [rbp-12]	    // eax = j
         mov     DWORD PTR [rbp-4], eax	    //min_inx = j
-.L4:
+
+
+.IF1
         add     DWORD PTR [rbp-12], 1	    // j+1
         jmp     .L5
-.L3:
-        mov     eax, DWORD PTR [rbp-4]	   //eax = 
+.END2
+
+
+        mov     eax, DWORD PTR [rbp-4]	   //eax = min_inx
         cdqe
-        mov     eax, DWORD PTR [rbp-48+rax*4]
-        mov     DWORD PTR [rbp-16], eax
-        mov     eax, DWORD PTR [rbp-8]
+        mov     eax, DWORD PTR [rbp-48+rax*4] //eax = a[min_inx]
+        mov     DWORD PTR [rbp-16], eax //temp = a[min_inx] 
+        
+        mov     eax, DWORD PTR [rbp-8] //eax = i         
         cdqe
-        mov     edx, DWORD PTR [rbp-48+rax*4]
-        mov     eax, DWORD PTR [rbp-4]
+        mov     edx, DWORD PTR [rbp-48+rax*4] //edx = a[i]
+        mov     eax, DWORD PTR [rbp-4] //eax = min_inx        
         cdqe
-        mov     DWORD PTR [rbp-48+rax*4], edx
-        mov     eax, DWORD PTR [rbp-8]
+        mov     DWORD PTR [rbp-48+rax*4], edx //a[min_inx] = a[i]
+
+
+        mov     eax, DWORD PTR [rbp-8] //eax = i  
         cdqe
-        mov     edx, DWORD PTR [rbp-16]
-        mov     DWORD PTR [rbp-48+rax*4], edx
+        mov     edx, DWORD PTR [rbp-16] //edx = temp 
+        mov     DWORD PTR [rbp-48+rax*4], edx //a[i] = temp
+        
+        
         add     DWORD PTR [rbp-8], 1
         jmp     .L6
-.L2:
+.END1
         mov     eax, 0
         pop     rbp
         ret
