@@ -68,6 +68,8 @@ public:
 	int find_for_end(int n);
  	void print_variable_information(Funct &funct);
  	void print_vars(Funct &funct);
+	int get_offset1(string name, Funct &f);
+	void a_magic_function(string code, Funct &f);
 private:
 	vector<string>source;
 	vector<Funct> functions;

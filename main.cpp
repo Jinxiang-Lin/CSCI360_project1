@@ -26,7 +26,7 @@ int main(){
 
 	Assembler assembler;
 	assembler.inputSource(source);
-	assembler.printSource();
+	//assembler.printSource();
 	assembler.function_handler();
 	
 	return 0;

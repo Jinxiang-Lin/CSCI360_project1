@@ -364,7 +364,6 @@ void Assembler::function_handler(){
 			f.vars.push_back(f.vars_storage[i][j]);
 		}
 	}
-
 	//check if main calls another function
 	if(check_leaf_funct() == 0){
 		string function_head = source[0];
@@ -530,31 +529,32 @@ void Assembler::function_handler(){
 	//print_variable_information(f);
 	//print_vars(f);
 
-
-	/*section 2: handling loop and condition*/
-	/*main function*/
-	vector<string> iterate;
-	vector<int> arr1;
-	vector<int> arr2;
-	int forif_count = 0;
-	int for_count = 0;
-	int if_count = 0;
-	int loc = 4;
-	while(loc < source.size()){
-		
-		if(source[loc].find("for") == 0){
+	else{
+		vector<string> iterate;
+		vector<int> arr1;
+		vector<int> arr2;
+		int forif_count = 0;
+		int for_count = 0;
+		int if_count = 0;
+		int loc = 4;
+		while(loc < source.size()){
+			if(source[loc].find("for") == 0){
 				forif_count++;
 				for_count++;
 				iterate.push_back(for_begin_handler(loc,f,for_count));
 				arr1.push_back(find_for_end(forif_count));
-		}
-		else if(source[loc].find("if") == 0){
+			}
+			else if(source[loc].find("if") == 0){
 				forif_count++;
 				if_count++;
 				if_statement_handler(loc,f,if_count);
 				arr2.push_back(find_for_end(forif_count));
-		} 
-		else if(!arr1.empty() && arr1.at(arr1.size()-1) == loc){
+			}  
+			else if(source[loc].find("=") < 11 && source[loc].find("for") != 0 &&
+			source[loc].find("if") != 0){
+				a_magic_function(source[loc],f);
+			}
+			else if(!arr1.empty() && arr1.at(arr1.size()-1) == loc){
 				arithmetic_string_handler(iterate.at(iterate.size()-1),f);
 				string for_string = to_string(for_count);
 				f.assembly_instructions.push_back("jmp .BEGIN" + for_string);
@@ -562,13 +562,20 @@ void Assembler::function_handler(){
 				arr1.pop_back();
 				iterate.pop_back();
 				for_count--;    
-		}
-		else if(!arr2.empty() && arr2.at(arr2.size()-1) == loc){
-			string n = to_string(if_count);
-			f.assembly_instructions.push_back(".IF" + n);
-		}   
-		loc++; 
-	} 
+			}
+			else if(!arr2.empty() && arr2.at(arr2.size()-1) == loc){
+				string n = to_string(if_count);
+				f.assembly_instructions.push_back(".IF" + n);
+			}    
+			loc++; 
+		} 
+		f.assembly_instructions.push_back(add_mov("(%eax)", "0",32));
+		f.assembly_instructions.push_back("pop rbp");
+		f.assembly_instructions.push_back("ret");
+	}
+	/*section 2: handling loop and condition*/
+	/*main function*/
+	
 	print_assembly_instructions(f);
 	
 }
@@ -675,5 +682,171 @@ int Assembler::find_for_end(int n){
 	return forif_end;
 }
 
+int Assembler::get_offset1(string name, Funct &f){
+	for (int i = 0; i <f.vars.size(); i++) {
+		if(f.vars[i].variables_name == name){
+			return f.vars[i].address_offset;
+		}
+	}
+	return -1;
+}
+
+
+void Assembler::a_magic_function(string code, Funct &f){
+	/*min_inx = i;
+	min_inx = j;
+	int temp=a[min_inx];
+	a[min_inx]=a[i];
+	a[i] = temp;*/
+	vector<string> temp;
+	DataConverter::split(code, temp, '=');
+	string op1=temp[0];
+	string op2=temp[1];
+
+	//int temp=a[min_inx];
+	if(code.find("int")==0){
+		string var_name(1, op1[4]);
+		string index(1, op2[2]);
+		string v(1,op2[0]);
+		//cout << sub << endl;
+		int index_offset = get_offset1(index, f);
+		int v_offset = get_offset1(v, f);
+		//cout << v_offset << endl;
+		
+		string a1 = to_string(index_offset);
+		a1 += "(%rbp)";
+		string a2 = "%edx";
+		string a3 = add_mov(a1, a2, 32);
+		f.assembly_instructions.push_back(a3);
+		f.assembly_instructions.push_back("cltq");
+		a1 = to_string(v_offset);
+		a1 += "(%rbp,rax,4)";
+		a3 = add_mov(a1,a2,32);
+		f.assembly_instructions.push_back(a3);
+		string x = "int t = 0";
+		vector<Var> var = vars_handler(x, address_offset);
+		for(int i = 0; i < var.size(); i++){
+			f.vars.push_back(var[i]);
+		}
+		
+		index_offset = get_offset1(var_name, f);
+		a1 = "%eax";
+		a2 = to_string(index_offset);
+		a2+="(%rbp)";
+		a3 = add_mov(a1,a2,32);
+		f.assembly_instructions.push_back(a3);
+
+	}
+	else if(code.find('[') != -1){
+		if(op1.find('[') != -1){
+			string index(1, op1[2]);
+			string v(1,op1[0]);
+			//cout << sub << endl;
+			int index_offset = get_offset1(index, f);
+			int v_offset = get_offset1(v, f);
+			//cout << v_offset << endl;
+			
+			string a1 = to_string(index_offset);
+			a1 += "(%rbp)";
+			string a2 = "%eax";
+			string a3 = add_mov(a1, a2, 32);
+			f.assembly_instructions.push_back(a3);
+			f.assembly_instructions.push_back("cltq");
+			a1 = to_string(v_offset);
+			a1 += "(%rbp,rax,4)";
+			a3 = add_mov(a1,a2,32);
+			f.assembly_instructions.push_back(a3);
+			if(op2.find('[') != -1){
+				//a[i];
+				string index(1, op2[2]);
+				string v(1,op2[0]);
+				//cout << sub << endl;
+				int index_offset = get_offset1(index, f);
+				int v_offset = get_offset1(v, f);
+				//cout << v_offset << endl;
+		
+				string a1 = to_string(index_offset);
+				a1 += "(%rbp)";
+				string a2 = "%edx";
+				string a3 = add_mov(a1, a2, 32);
+				f.assembly_instructions.push_back(a3);
+				f.assembly_instructions.push_back("cltq");
+				a1 = to_string(v_offset);
+				a1 += "(%rbp,rax,4)";
+				a3 = add_mov(a1,a2,32);
+				f.assembly_instructions.push_back(a3);
+				if(op1.find('[') != -1 && op2.find(']') != -1){
+					f.assembly_instructions.push_back("movl %eax, %edx");
+					string index(1, op1[2]);
+					string v(1,op1[0]);
+					//cout << sub << endl;
+					int index_offset = get_offset1(index, f);
+					int v_offset = get_offset1(v, f);
+					//cout << v_offset << endl;
+			
+					string a1 = to_string(index_offset);
+					a1 += "(%rbp)";
+					string a2 = "%eax";
+					string a3 = add_mov(a1, a2, 32);
+					f.assembly_instructions.push_back(a3);
+					f.assembly_instructions.push_back("cltq");
+					a1 = to_string(v_offset);
+					a1 += "(%rbp,rax,4)";
+					a3 = add_mov(a2,a1,32);
+					f.assembly_instructions.push_back(a3);
+				}
+			}
+			//a[i]=temp
+			else if(op2.find('[') == string::npos){
+				string v(1,op2[0]);
+				int v_offset = get_offset1(v, f);
+				string a1 = to_string(v_offset);
+				a1+= "(%rbp)";
+				string a2 = "%edx";
+				string a3 = add_mov(a1,a2,32);
+				f.assembly_instructions.push_back(a3);
+
+				string v2(1,op1[2]);
+				v_offset = get_offset1(v2,f);
+				a1 = to_string(v_offset);
+				a1+="(%rbp)";
+				a3 = add_mov(a1,a2,32);
+				f.assembly_instructions.push_back(a3);
+				f.assembly_instructions.push_back("cltq");
+
+				string v3(1,op1[0]);
+				v_offset = get_offset1(v3,f);
+				a1 = to_string(v_offset);
+				a1+="(%rbp,rax,4)";
+				a2 = "%eax";
+				a3 = add_mov(a2,a1,32);
+				f.assembly_instructions.push_back(a3);
+
+			}
+		}
+
+	}
+	//min_inx=i;
+	else{
+		string index(1,op2[0]);
+		int i_offset = get_offset1(index, f);
+		string a1 = to_string(i_offset);
+		a1+="(%rbp)";
+		string a2 = "%eax";
+		string a3 = add_mov(a1,a2,32);
+		f.assembly_instructions.push_back(a3);
+
+		string m(1,op1[0]);
+		i_offset = get_offset1(m,f);
+		a1 = to_string(i_offset);
+		a1+="(%rbp)";
+		a2 = "%eax";
+		a3 = add_mov(a2,a1,32);
+		f.assembly_instructions.push_back(a3);
+	}
+
+
+	
+}
 // alternative version end here;
 
