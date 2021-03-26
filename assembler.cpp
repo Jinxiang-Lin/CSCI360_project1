@@ -180,8 +180,8 @@ string Assembler::for_begin_handler(int loc, Funct &f, int n){
 	f.assembly_instructions.push_back("jg .END" + n_string);
 	//i++
 	iterate_string = temp1.at(0); 
-	for(auto &vars : variables){
-		f.vars.push_back(vars);
+	for(auto &var : variables){
+		f.vars.push_back(var);
 	}
 	return iterate_string;
 
@@ -550,7 +550,7 @@ void Assembler::function_handler(){
 				if_statement_handler(loc,f,if_count);
 				arr2.push_back(find_for_end(forif_count));
 			}  
-			else if(source[loc].find("=") < 11 && source[loc].find("for") != 0 &&
+			else if(source[loc].find("=") < 20 && source[loc].find("for") != 0 &&
 			source[loc].find("if") != 0){
 				a_magic_function(source[loc],f);
 			}
